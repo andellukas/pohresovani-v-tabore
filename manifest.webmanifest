@@ -1,0 +1,12 @@
+{
+  "name": "Pohřešovaná osoba – Tábor a okolí",
+  "short_name": "Pátrání Tábor",
+  "description": "Offline krizová PWA aplikace pro pohřešování osoby v Táboře a okolí.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1f3a",
+  "theme_color": "#0b1f3a",
+  "orientation": "portrait-primary",
+  "icons": []
+}

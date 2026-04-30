@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1f3a">
+  <meta name="description" content="Offline krizová PWA aplikace pro pohřešování osoby v Táboře a okolí.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>Pohřešovaná osoba – Tábor a okolí</title>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero__badge">Offline krizový postup</div>
+    <h1>Pohřešovaná osoba – Tábor a okolí</h1>
+    <p class="lead">Nečekejte 24 hodin. Při důvodném podezření volejte Policii ČR a koordinujte postup s ní.</p>
+    <div class="hero__actions">
+      <a class="btn btn--danger" href="#rozcestnik">Začít krizový postup</a>
+      <a class="btn btn--call" href="tel:158">Volat Policii ČR 158</a>
+      <a class="btn btn--secondary" href="tel:222762227">Volat Czech SAR Team</a>
+    </div>
+    <div class="notice notice--critical">Nečekejte 24 hodin. Při dítěti, seniorovi, zdravotním riziku, dopisu na rozloučenou nebo sebevražedném riziku volejte 158 ihned.</div>
+  </header>
+
+  <nav class="quicknav" aria-label="Hlavní části aplikace">
+    <a href="#rozcestnik">Riziko</a>
+    <a href="#postup">Postup</a>
+    <a href="#formular">Formulář</a>
+    <a href="#kontakty">Kontakty</a>
+    <a href="#koordinace">Koordinace</a>
+    <a href="#oblasti">Oblasti</a>
+    <a href="#tipy">Tipy</a>
+    <a href="#timeline">Časová osa</a>
+  </nav>
+
+  <main>
+    <section class="card" id="rozcestnik">
+      <div class="section-head">
+        <p class="eyebrow">1 / Krizový rozcestník</p>
+        <h2>Vyhodnocení závažnosti</h2>
+        <p>Odpovězte rychle. Pokud se objeví kritické riziko, první akce je volat 158.</p>
+      </div>
+      <div id="riskQuestions" class="question-grid"></div>
+      <div id="riskResult" class="risk-result" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card" id="postup">
+      <div class="section-head">
+        <p class="eyebrow">2 / Okamžitý postup</p>
+        <h2>Checklist prvních kroků</h2>
+        <p>Odškrtávání se ukládá jen v tomto zařízení.</p>
+      </div>
+      <div id="checklist" class="checklist"></div>
+    </section>
+
+    <section class="card print-block" id="formular">
+      <div class="section-head">
+        <p class="eyebrow">3 / Formulář</p>
+        <h2>Informace o pohřešované osobě</h2>
+        <p>Minimum pro hlášení: jméno, poslední známé místo, poslední známý čas, kontaktní telefon.</p>
+      </div>
+      <form id="personForm" class="form-grid" autocomplete="on"></form>
+      <div id="validationBox" class="notice"></div>
+      <div class="button-row">
+        <button class="btn" type="button" data-copy="police">Zkopírovat hlášení pro Policii</button>
+        <button class="btn" type="button" data-copy="sar">Zkopírovat hlášení pro SAR tým</button>
+        <button class="btn" type="button" data-copy="facebook">Zkopírovat text na Facebook</button>
+        <button class="btn" type="button" onclick="window.print()">Vytisknout formulář</button>
+      </div>
+      <pre id="generatedText" class="output" aria-live="polite"></pre>
+    </section>
+
+    <section class="card print-block" id="kontakty">
+      <div class="section-head">
+        <p class="eyebrow">4 / Kontakty</p>
+        <h2>Důležité kontakty pro Tábor</h2>
+        <p>Aplikace nenahrazuje Policii ČR. Postup koordinujte s Policií ČR.</p>
+      </div>
+      <div id="contacts" class="contact-list"></div>
+    </section>
+
+    <section class="card" id="koordinace">
+      <div class="section-head">
+        <p class="eyebrow">5 / Koordinace</p>
+        <h2>Koordinátor a dobrovolníci</h2>
+        <p>Jedna osoba musí držet přehled. Chaotické pátrání může znehodnotit stopy.</p>
+      </div>
+      <div class="form-grid compact">
+        <label>Jméno koordinátora<input id="coordName" type="text"></label>
+        <label>Telefon koordinátora<input id="coordPhone" type="tel"></label>
+        <label>Místo srazu<input id="meetingPoint" type="text"></label>
+        <label>Čas poslední aktualizace<input id="lastUpdate" type="datetime-local"></label>
+      </div>
+      <h3>Dobrovolníci</h3>
+      <form id="volunteerForm" class="inline-form">
+        <input name="name" placeholder="Jméno dobrovolníka" required>
+        <input name="phone" placeholder="Telefon" type="tel">
+        <input name="area" placeholder="Přidělená oblast">
+        <select name="state"></select>
+        <button class="btn" type="submit">Přidat</button>
+      </form>
+      <div id="volunteers" class="table-wrap"></div>
+    </section>
+
+    <section class="card print-block" id="oblasti">
+      <div class="section-head">
+        <p class="eyebrow">6 / Offline mapa oblastí</p>
+        <h2>Ruční evidence prohledaných oblastí</h2>
+        <p>Bez externí mapy. Evidence funguje lokálně a offline.</p>
+      </div>
+      <form id="areaForm" class="inline-form">
+        <input name="name" placeholder="Název oblasti" required>
+        <input name="terrain" placeholder="Typ terénu">
+        <input name="searchedBy" placeholder="Kdo hledal">
+        <input name="from" type="datetime-local" title="Čas od">
+        <input name="to" type="datetime-local" title="Čas do">
+        <input name="result" placeholder="Výsledek">
+        <input name="note" placeholder="Poznámky">
+        <select name="state"></select>
+        <button class="btn" type="submit">Přidat oblast</button>
+      </form>
+      <button class="btn btn--secondary" id="exportAreas" type="button">Export oblastí do CSV</button>
+      <div id="areas" class="table-wrap"></div>
+    </section>
+
+    <section class="card print-block" id="tipy">
+      <div class="section-head">
+        <p class="eyebrow">7 / Tipy a svědectví</p>
+        <h2>Evidence tipů</h2>
+        <p>Relevantní tipy předávejte Policii ČR. Nešiřte neověřené informace.</p>
+      </div>
+      <form id="tipForm" class="inline-form">
+        <input name="who" placeholder="Kdo tip zadal" required>
+        <input name="phone" placeholder="Telefon" type="tel">
+        <input name="seenTime" type="datetime-local" title="Čas pozorování">
+        <input name="place" placeholder="Místo">
+        <input name="what" placeholder="Co viděl">
+        <select name="credibility"></select>
+        <select name="police"><option value="ne">předáno policii: ne</option><option value="ano">předáno policii: ano</option></select>
+        <input name="note" placeholder="Poznámka">
+        <button class="btn" type="submit">Přidat tip</button>
+      </form>
+      <label class="filter"><input id="onlyUnsentTips" type="checkbox"> Zobrazit jen nepředané tipy</label>
+      <div id="tips" class="table-wrap"></div>
+    </section>
+
+    <section class="card" id="timeline">
+      <div class="section-head">
+        <p class="eyebrow">8 / Stopky a časová osa</p>
+        <h2>Časová osa událostí</h2>
+        <p>Přesný čas pomáhá policii i pátracím týmům.</p>
+      </div>
+      <div class="time-panel">
+        <div><strong id="timer">00:00:00</strong><span>Od času zmizení, pokud je vyplněn.</span></div>
+      </div>
+      <div class="form-grid compact">
+        <label>Čas zmizení<input id="timeMissing" type="datetime-local"></label>
+        <label>Čas nahlášení policii<input id="timePolice" type="datetime-local"></label>
+        <label>Čas kontaktování SAR<input id="timeSar" type="datetime-local"></label>
+        <label>Čas vytvoření FB skupiny<input id="timeFb" type="datetime-local"></label>
+      </div>
+      <form id="eventForm" class="inline-form">
+        <input name="time" type="datetime-local" required>
+        <input name="text" placeholder="Další událost" required>
+        <button class="btn" type="submit">Přidat událost</button>
+      </form>
+      <div id="events" class="timeline"></div>
+    </section>
+
+    <section class="card privacy" id="soukromi">
+      <div class="section-head">
+        <p class="eyebrow">9 / Soukromí</p>
+        <h2>Data zůstávají v tomto zařízení</h2>
+        <p>Aplikace neposílá žádná data ven. Všechno je uloženo pouze v localStorage prohlížeče. Zařízení proto může obsahovat citlivá data.</p>
+      </div>
+      <button class="btn btn--danger" id="wipeData" type="button">Smazat všechna uložená data</button>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Nouze:</strong> Policie ČR 158. Aplikace je pomocný krizový nástroj, nenahrazuje Policii ČR. Koordinujte postup s Policií ČR.
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
